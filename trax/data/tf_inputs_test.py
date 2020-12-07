@@ -111,6 +111,17 @@ class TFInputsTest(tf.test.TestCase):
     super().setUp()
     gin.clear_config()
 
+  def test_convert_to_unicode(self):
+    def dataset():
+      yield (b'Audentes fortuna iuvat.', b'Fortune favors the bold.')
+
+    convert_function = tf_inputs.ConvertToUnicode(keys=[0])
+    convert_output1 = next(convert_function(dataset()))
+    self.assertEqual(convert_output1[0], 'Audentes fortuna iuvat.')
+    self.assertEqual(convert_output1[1], b'Fortune favors the bold.')
+    self.assertIsInstance(convert_output1[0], str)
+    self.assertIsInstance(convert_output1[1], bytes)
+
   def test_tokenize_detokenize(self):
     def dataset():
       yield 'I have a cat.'
